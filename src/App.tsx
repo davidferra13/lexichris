@@ -2,36 +2,11 @@ import { useState } from 'react'
 import { CalendarPlus, ChevronDown, MapPin, MessageCircle } from 'lucide-react'
 import { PinballArcade } from './components/PinballArcade'
 import { RagdollEasterEgg } from './components/RagdollEasterEgg'
+import { downloadCalendar } from './calendar'
 import { siteConfig } from './siteConfig'
 import './styles.css'
 
 type TapTarget = 'lexi' | 'chris'
-
-function downloadCalendar() {
-  const { dateISO, locationLabel, venueLabel } = siteConfig.details
-  if (!dateISO) return
-  const date = dateISO.replaceAll('-', '')
-  const location = [venueLabel, locationLabel].filter(Boolean).join(', ')
-  const body = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'BEGIN:VEVENT',
-    `DTSTART;VALUE=DATE:${date}`,
-    `DTEND;VALUE=DATE:${date}`,
-    'SUMMARY:Lexi + Chris',
-    `LOCATION:${location}`,
-    'DESCRIPTION:Save the date. Formal invitation to follow.',
-    'END:VEVENT',
-    'END:VCALENDAR',
-  ].join('\r\n')
-  const blob = new Blob([body], { type: 'text/calendar;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const anchor = document.createElement('a')
-  anchor.href = url
-  anchor.download = 'lexi-and-chris-save-the-date.ics'
-  anchor.click()
-  URL.revokeObjectURL(url)
-}
 
 function App() {
   const [, setTapCount] = useState({ lexi: 0, chris: 0 })
@@ -53,7 +28,7 @@ function App() {
       <main className="site-shell">
         <section className="hero" id="top">
           <div className="hero-photo-wrap">
-            <img src="./assets/lexi-chris-hero.png" alt="Lexi and Chris together outdoors" className="hero-photo" />
+            <img src="./assets/lexi-chris-hero.png" alt="Lexi and Chris together outdoors" className="hero-photo" fetchPriority="high" decoding="async" />
             <div className="hero-mark" aria-hidden="true">L + C</div>
           </div>
           <div className="hero-copy">
@@ -68,15 +43,18 @@ function App() {
               <p>{details.locationLabel ?? 'details to follow'}</p>
             </div>
             <p className="invitation-note">{copy.invitation}</p>
-            <div className="hero-actions">
-              <button type="button" className="primary-action" onClick={downloadCalendar} disabled={!details.dateISO}>
-                <CalendarPlus size={18} />
-                {details.dateISO ? 'add to calendar' : 'calendar unlocks with the date'}
-              </button>
-              {siteConfig.features.messageFormEnabled && (
-                <button type="button" className="secondary-action"><MessageCircle size={18} /> leave a message</button>
-              )}
-            </div>
+            {(details.dateISO || siteConfig.features.messageFormEnabled) && (
+              <div className="hero-actions">
+                {details.dateISO && (
+                  <button type="button" className="primary-action" onClick={downloadCalendar}>
+                    <CalendarPlus size={18} /> add to calendar
+                  </button>
+                )}
+                {siteConfig.features.messageFormEnabled && (
+                  <button type="button" className="secondary-action"><MessageCircle size={18} /> leave a message</button>
+                )}
+              </div>
+            )}
           </div>
           <a className="scroll-cue" href="#details" aria-label="scroll to details"><ChevronDown size={22} /></a>
         </section>
@@ -107,7 +85,7 @@ function App() {
           {!detailsReady && (
             <div className="status-note">
               <MapPin size={17} />
-              <span>this page is live-ready; final date + location content can be dropped in without rebuilding it.</span>
+              <span>date + location will be posted here as soon as they are final.</span>
             </div>
           )}
         </section>

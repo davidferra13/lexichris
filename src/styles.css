@@ -421,3 +421,26 @@ body { overflow-x: hidden; }
   .hero-actions { width: calc(100vw - 52px); max-width: 360px; }
   .primary-action, .secondary-action { padding-left: 14px; padding-right: 14px; font-size: 12px; }
 }
+
+.arcade-score {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+}
+.arcade-score > div { min-width: 58px; }
+.arcade-help {
+  width: min(100%, 920px);
+  margin: 12px auto 0;
+  color: #6f6b66;
+  font-size: 9px;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+@media (max-width: 520px) {
+  .arcade-title-row { gap: 10px; }
+  .arcade-score { gap: 8px; }
+  .arcade-score > div { min-width: 48px; }
+  .arcade-score strong { font-size: 14px; }
+}
